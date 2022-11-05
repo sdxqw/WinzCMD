@@ -1,5 +1,6 @@
 package io.github.axst;
 
+import io.github.sdxqw.winzcmd.Command;
 import lombok.Getter;
 
 public class ClientCore {
@@ -8,6 +9,7 @@ public class ClientCore {
     public static final ClientCore instance = new ClientCore();
 
     public void initializeClient() {
-        System.out.println("My First Injection!");
+        Command.addCommandByPath("io.github.axst");
+        System.out.println(Command.typeList);
     }
 }

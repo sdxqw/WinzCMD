@@ -61,6 +61,8 @@ dependencies {
 		exclude module: 'gson'
 		exclude module: 'commons-io'
 	}
+	compileOnly('org.reflections:reflections:0.10.2')
+	annotationProcessor('org.reflections:reflections:0.10.2')
 }
 
 processResources {

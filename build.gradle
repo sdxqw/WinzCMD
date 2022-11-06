@@ -51,7 +51,7 @@ dependencies {
 	annotationProcessor('org.reflections:reflections:0.10.2')
 
 	// sponge powered api
-	compileOnly('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+	implementation('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
 		exclude module: 'launchwrapper'
 		exclude module: 'guava'
 		exclude module: 'gson'

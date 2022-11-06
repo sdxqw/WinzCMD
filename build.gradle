@@ -33,7 +33,6 @@ minecraft {
 }
 
 mixin {
-	defaultObfuscationEnv notch
 	add sourceSets.main, "mixins.winzcmd.refmap.json"
 }
 

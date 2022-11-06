@@ -1,14 +1,14 @@
 buildscript {
-	repositories {
-		mavenCentral()
-		maven { url 'https://files.minecraftforge.net/maven' }
-		maven { url 'https://repo.spongepowered.org/maven' }
-		maven { url 'https://jitpack.io' }
-	}
-	dependencies {
-		classpath 'com.github.sdxqw:ForgeGradle:f2c5bb338e'
-		classpath 'com.github.sdxqw:MixinGradle:0.6-SNAPSHOT'
-	}
+    repositories {
+        mavenCentral()
+        maven { url 'https://files.minecraftforge.net/maven' }
+        maven { url 'https://repo.spongepowered.org/maven' }
+        maven { url 'https://jitpack.io' }
+    }
+    dependencies {
+        classpath 'com.github.sdxqw:ForgeGradle:f2c5bb338e'
+        classpath 'com.github.sdxqw:MixinGradle:0.6-SNAPSHOT'
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle.tweaker-client'
@@ -17,112 +17,91 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 compileJava {
-	sourceCompatibility = targetCompatibility = 8
+    sourceCompatibility = targetCompatibility = 8
 }
 
 version '1.0'
 group 'io.github.sdxqw.winzcmd'
 
+
 minecraft {
-	version = '1.8.9'
-	tweakClass = "io.github.sdxqw.winzcmd.mixins.Tweaker"
-	mappings = 'stable_22'
-	runDir = 'run'
-	clientJvmArgs = ['-Dmixin.debug=true', '-XX:-DisableExplicitGC', '-Xmx1G', '-DFORGE_FORCE_FRAME_RECALC=true']
-	makeObfSourceJar = false
+    version = '1.8.9'
+    tweakClass = "io.github.sdxqw.winzcmd.mixins.Tweaker"
+    mappings = 'stable_22'
+    runDir = 'run'
+    clientJvmArgs = ['-Dmixin.debug=true', '-XX:-DisableExplicitGC', '-Xmx1G', '-DFORGE_FORCE_FRAME_RECALC=true']
+    makeObfSourceJar = false
 }
 
+
 mixin {
-	defaultObfuscationEnv notch
-	add sourceSets.main, "mixins.winzcmd.refmap.json"
+    defaultObfuscationEnv notch
+    add sourceSets.main, "mixins.winzcmd.refmap.json"
 }
 
 configurations {
-	winz
-	implementation.extendsFrom winz
-	runtime.extendsFrom winz
+    winz
+    implementation.extendsFrom winz
+    runtime.extendsFrom winz
 }
 
 repositories {
-	mavenCentral()
-	maven { url 'https://libraries.minecraft.net' }
-	maven { url 'https://repo.spongepowered.org/maven' }
-	maven { url 'https://jitpack.io' }
+    mavenCentral()
+    maven { url 'https://libraries.minecraft.net' }
+    maven { url 'https://repo.spongepowered.org/maven' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-	compileOnly('org.projectlombok:lombok:1.18.24')
-	annotationProcessor('org.projectlombok:lombok:1.18.24')
-	compileOnly('org.reflections:reflections:0.10.2')
-	annotationProcessor('org.reflections:reflections:0.10.2')
+    compileOnly('org.projectlombok:lombok:1.18.24')
+    annotationProcessor('org.projectlombok:lombok:1.18.24')
+    compileOnly('org.reflections:reflections:0.10.2')
+    annotationProcessor('org.reflections:reflections:0.10.2')
+    winz('commons-lang:commons-lang:2.6')
+    winz('io.github.sdxqw:AxstLogger:0.1')
 
-	// sponge powered api
-	winz('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
-		exclude module: 'launchwrapper'
-		exclude module: 'guava'
-		exclude module: 'gson'
-		exclude module: 'commons-io'
-	}
-
-	// test
-	testImplementation('org.junit.jupiter:junit-jupiter-api:5.9.0')
-	testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.9.0')
-}
-
-test {
-	useJUnitPlatform()
-}
-
-processResources {
-	inputs.files 'src/main/resources'
-	outputs.dir 'build/classes/main'
-	copy {
-		from('src/main/resources')
-		into('build/classes/main')
-	}
+    // sponge powered api
+    winz('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
+    }
 }
 
 jar {
-	manifest.attributes(
-			'MixinConfigs': 'mixins.winzcmd.json',
-			'Manifest-Version': 1.0
-	)
+    exclude "**/Tweaker.class"
+    dependsOn configurations.compile
+    from {
+        configurations.winz.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'LICENSE.txt', 'dummyThing'
 }
 
 jar {
-	dependsOn configurations.compile
-	from {
-		configurations.winz.collect {
-			it.isDirectory() ? it : zipTree(it)
-		}
-	}
-	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'LICENSE.txt', 'dummyThing'
-}
+    manifest.attributes('MixinConfigs': 'mixins.winzcmd.json',
+            'Manifest-Version': 1.0)
 
-jar {
-	manifest.attributes(
-			'MixinConfigs': 'mixins.winzcmd.json',
-			'Manifest-Version': 1.0
-	)
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 
-	from {
-		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-	}
-
-	configurations.winz.each { dep ->
-		from(project.zipTree(dep)) {
-			exclude 'META-INF', 'META-INF/**'
-		}
-	}
+    configurations.winz.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
 }
 
 publishing {
-	publications {
-		maven(MavenPublication) {
-			groupId = 'io.github.sdxqw'
-			artifactId = 'WinzCMD'
-			version = '1.0'
-			from components.java
-		}
-	}
+    publications {
+        maven(MavenPublication) {
+            groupId = 'io.github.sdxqw'
+            artifactId = 'WinzCMD'
+            version = '1.0'
+            from components.java
+        }
+    }
 }

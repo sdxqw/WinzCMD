@@ -8,8 +8,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixins {
-    @Inject(method = "startGame", at = @At("RETURN"))
+    @Inject(method = "startGame", at = @At("HEAD"))
     public void startGame(CallbackInfo ci) {
-        System.out.println("TEST");
+    }
+
+    @Inject(method = "startGame", at = @At("RETURN"))
+    public void startGame2(CallbackInfo ci) {
     }
 }

@@ -37,6 +37,12 @@ mixin {
 	add sourceSets.main, "mixins.winzcmd.refmap.json"
 }
 
+configurations {
+	winz
+	implementation.extendsFrom winz
+	runtime.extendsFrom winz
+}
+
 repositories {
 	mavenCentral()
 	maven { url 'https://libraries.minecraft.net' }
@@ -51,14 +57,7 @@ dependencies {
 	annotationProcessor('org.reflections:reflections:0.10.2')
 
 	// sponge powered api
-	runtime('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
-		exclude module: 'launchwrapper'
-		exclude module: 'guava'
-		exclude module: 'gson'
-		exclude module: 'commons-io'
-	}
-
-	implementation('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+	winz('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
 		exclude module: 'launchwrapper'
 		exclude module: 'guava'
 		exclude module: 'gson'
@@ -74,13 +73,40 @@ test {
 	useJUnitPlatform()
 }
 
+processResources {
+	inputs.files 'src/main/resources'
+	outputs.dir 'build/classes/main'
+	copy {
+		from('src/main/resources')
+		into('build/classes/main')
+	}
+}
+
 jar {
+	dependsOn configurations.compile
+	from {
+		configurations.winz.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'LICENSE.txt', 'dummyThing'
+
 	manifest.attributes(
 			'MixinConfigs': "mixins.winzcmd.json",
 			'TweakClass': "io.github.sdxqw.dev.Tweaker",
 			'TweakOrder': 0,
 			'Manifest-Version': 1.0
 	)
+
+	from {
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+
+	configurations.winz.each { dep ->
+		from(project.zipTree(dep)) {
+			exclude 'META-INF', 'META-INF/**'
+		}
+	}
 }
 
 publishing {

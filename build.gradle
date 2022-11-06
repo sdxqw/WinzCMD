@@ -89,6 +89,33 @@ jar {
 	)
 }
 
+jar {
+	dependsOn configurations.compile
+	from {
+		configurations.winz.collect {
+			it.isDirectory() ? it : zipTree(it)
+		}
+	}
+	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'LICENSE.txt', 'dummyThing'
+}
+
+jar {
+	manifest.attributes(
+			'MixinConfigs': 'mixins.winzcmd.json',
+			'Manifest-Version': 1.0
+	)
+
+	from {
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+
+	configurations.winz.each { dep ->
+		from(project.zipTree(dep)) {
+			exclude 'META-INF', 'META-INF/**'
+		}
+	}
+}
+
 publishing {
 	publications {
 		maven(MavenPublication) {

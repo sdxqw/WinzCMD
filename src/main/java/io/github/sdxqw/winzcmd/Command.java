@@ -44,7 +44,7 @@ public class Command {
      */
     public static void unregisterCommand(ICommand command) {
         typeList.removeIf(e -> e.equals(command));
-        if (typeList.stream().anyMatch(e -> e.equals(command))) Logger.print("Command removed: " + command, Level.INFO);
+        if (typeList.stream().noneMatch(e -> e.equals(command))) Logger.print("Command removed: " + command, Level.INFO);
     }
 
     /**

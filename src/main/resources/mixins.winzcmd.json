@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "minVersion": "0.6",
+  "compatibilityLevel": "JAVA_8",
+  "package": "io.github.sdxqw.dev.mixins",
+  "refmap": "mixins.winz.refmap.json",
+  "target": "@env(DEFAULT)",
+  "verbose": true,
+  "mixins": [
+  ]
+}

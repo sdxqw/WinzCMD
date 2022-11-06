@@ -25,7 +25,7 @@ group 'io.github.sdxqw.winzcmd'
 
 minecraft {
 	version = '1.8.9'
-	tweakClass = "io.github.sdxqw.dev.Tweaker"
+	tweakClass = "io.github.sdxqw.winzcmd.mixins.Tweaker"
 	mappings = 'stable_22'
 	runDir = 'run'
 	clientJvmArgs = ['-Dmixin.debug=true', '-XX:-DisableExplicitGC', '-Xmx1G', '-DFORGE_FORCE_FRAME_RECALC=true']
@@ -33,6 +33,7 @@ minecraft {
 }
 
 mixin {
+	defaultObfuscationEnv notch
 	add sourceSets.main, "mixins.winzcmd.refmap.json"
 }
 
@@ -82,30 +83,10 @@ processResources {
 }
 
 jar {
-	dependsOn configurations.compile
-	from {
-		configurations.winz.collect {
-			it.isDirectory() ? it : zipTree(it)
-		}
-	}
-	exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'LICENSE.txt', 'dummyThing'
-
 	manifest.attributes(
-			'MixinConfigs': "mixins.winzcmd.json",
-			'TweakClass': "io.github.sdxqw.dev.Tweaker",
-			'TweakOrder': 0,
+			'MixinConfigs': 'mixins.winzcmd.json',
 			'Manifest-Version': 1.0
 	)
-
-	from {
-		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-	}
-
-	configurations.winz.each { dep ->
-		from(project.zipTree(dep)) {
-			exclude 'META-INF', 'META-INF/**'
-		}
-	}
 }
 
 publishing {

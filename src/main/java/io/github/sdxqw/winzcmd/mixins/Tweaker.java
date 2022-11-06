@@ -1,4 +1,4 @@
-package io.github.sdxqw.dev;
+package io.github.sdxqw.winzcmd.mixins;
 
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;

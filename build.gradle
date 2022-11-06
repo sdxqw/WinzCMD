@@ -51,6 +51,13 @@ dependencies {
 	annotationProcessor('org.reflections:reflections:0.10.2')
 
 	// sponge powered api
+	runtime('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+		exclude module: 'launchwrapper'
+		exclude module: 'guava'
+		exclude module: 'gson'
+		exclude module: 'commons-io'
+	}
+
 	implementation('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
 		exclude module: 'launchwrapper'
 		exclude module: 'guava'
@@ -65,6 +72,15 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+jar {
+	manifest.attributes(
+			'MixinConfigs': "mixins.winzcmd.json",
+			'TweakClass': "io.github.sdxqw.dev.Tweaker",
+			'TweakOrder': 0,
+			'Manifest-Version': 1.0
+	)
 }
 
 publishing {
